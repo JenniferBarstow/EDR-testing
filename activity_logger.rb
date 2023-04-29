@@ -35,14 +35,14 @@ class ActivityLogger
   end
 
   def log_file_activity(
-    file_path, file_type, activity_descriptor,
+    file_path, activity_descriptor,
     process_name, command_line = '', process_id
   )
     log_entry = {
       type: 'file activity',
       timestamp: DateTime.now.to_time.utc.strftime('%Y-%m-%d %H:%M:%S'),
       file_path: file_path,
-      file_type: file_type || File.extname(file_path)[1..],
+      file_type:  File.extname(file_path),
       activity_descriptor: activity_descriptor,
       username: ENV['USER'] || ENV['USERNAME'],
       process_name: process_name,

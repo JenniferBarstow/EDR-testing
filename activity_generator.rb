@@ -39,8 +39,6 @@ class ActivityGenerator
   end
 
   def generate_file_creation(file_path)
-    file_type = File.extname(file_path)
-  
     begin
       case RUBY_PLATFORM
       when /mswin|mingw|cygwin/
@@ -57,7 +55,7 @@ class ActivityGenerator
       )
       return
     else
-      @logger.log_file_activity(file_path, file_type, 'create', process_name = 'file creation', command_line = $PROGRAM_NAME,
+      @logger.log_file_activity(file_path, 'create', process_name = 'file creation', command_line = $PROGRAM_NAME,
                                 process_id = Process.pid)
     end
     write_log_to_file
@@ -86,7 +84,7 @@ class ActivityGenerator
       return
     else
       @logger.log_file_activity(
-        file_path, '', 'modify', process_name = 'file modification', command_line = $PROGRAM_NAME, process_id = Process.pid
+        file_path, 'modify',  process_name = 'file modification', command_line = $PROGRAM_NAME, process_id = Process.pid
       )
     end
     write_log_to_file
@@ -106,7 +104,7 @@ class ActivityGenerator
       return
     else
       @logger.log_file_activity(
-        file_path, '', 'delete', process_name = 'file deletion', command_line = $PROGRAM_NAME, process_id = Process.pid
+        file_path, 'delete', process_name = 'file deletion', command_line = $PROGRAM_NAME, process_id = Process.pid
       )
     end
     write_log_to_file
