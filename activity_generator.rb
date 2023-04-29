@@ -61,6 +61,56 @@ class ActivityGenerator
     write_log_to_file
   end
 
+  def generate_file_modification(file_path, new_contents)
+    begin
+      unless File.exist?(file_path)
+        puts "File does not exist: #{file_path}"
+        @logger.log_error_activity(
+          process_name: 'file modification',
+          command_line: $PROGRAM_NAME,
+          error_message: "File does not exist: #{file_path}"
+        )
+        return
+      end
+      # Modify the file
+      File.open(file_path, 'w') { |file| file.write(new_contents) }
+    rescue StandardError => e
+      puts "Failed to modify file: #{e.message}"
+      @logger.log_error_activity(
+        process_name = 'file modification',
+        command_line = $PROGRAM_NAME,
+        error_message = e.message
+      )
+      return
+    else
+      @logger.log_file_activity(
+        file_path, '', 'modify', process_name = 'file modification', command_line = $PROGRAM_NAME, process_id = Process.pid
+      )
+    end
+    write_log_to_file
+  end
+
+  def generate_file_deletion(file_path)
+    begin
+      # Delete the file
+      File.delete(file_path)
+    rescue StandardError => e
+      puts "Failed to delete file: #{e.message}"
+      @logger.log_error_activity(
+        process_name = 'file deletion',
+        command_line = $PROGRAM_NAME,
+        error_message = e.message
+      )
+      return
+    else
+      @logger.log_file_activity(
+        file_path, '', 'delete', process_name = 'file deletion', command_line = $PROGRAM_NAME, process_id = Process.pid
+      )
+    end
+    write_log_to_file
+  end
+
+
   def write_log_to_file
     @logger.write_log_to_file('activity_log.json')
   end

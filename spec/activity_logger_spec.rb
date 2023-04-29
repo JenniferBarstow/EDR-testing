@@ -63,5 +63,44 @@ describe ActivityLogger do
                                                           ])
       end
     end
+    context 'file modification' do
+      it 'logs a file modification activity event' do
+        allow(DateTime).to receive(:now).and_return(DateTime.new(2021, 1, 1, 0, 0, 0))
+        logger.log_file_activity('example.txt', '', 'modify', 'file modification', $PROGRAM_NAME, '1234')
+        expect(logger.instance_variable_get(:@log)).to eq([
+                                                            {
+                                                              type: 'file activity',
+                                                              timestamp: '2021-01-01 00:00:00',
+                                                              file_path: 'example.txt',
+                                                              file_type: '',
+                                                              activity_descriptor: 'modify',
+                                                              username: user,
+                                                              process_name: 'file modification',
+                                                              command_line: $0,
+                                                              process_id: '1234'
+                                                            }
+                                                          ])
+      end
+    end
+
+    context 'file deletion' do
+      it 'logs a file modification activity event' do
+        allow(DateTime).to receive(:now).and_return(DateTime.new(2021, 1, 1, 0, 0, 0))
+        logger.log_file_activity('example.txt', '', 'delete', 'file deletion', $PROGRAM_NAME, '1234')
+        expect(logger.instance_variable_get(:@log)).to eq([
+                                                            {
+                                                              type: 'file activity',
+                                                              timestamp: '2021-01-01 00:00:00',
+                                                              file_path: 'example.txt',
+                                                              file_type: '',
+                                                              activity_descriptor: 'delete',
+                                                              username: user,
+                                                              process_name: 'file deletion',
+                                                              command_line: $0,
+                                                              process_id: '1234'
+                                                            }
+                                                          ])
+      end
+    end
   end
 end
