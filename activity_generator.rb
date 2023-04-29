@@ -36,6 +36,31 @@ class ActivityGenerator
     write_log_to_file
   end
 
+  def generate_file_creation(file_path)
+    file_type = File.extname(file_path)
+  
+    begin
+      case RUBY_PLATFORM
+      when /mswin|mingw|cygwin/
+        `type nul > "#{file_path}"` # Windows
+      else
+        `touch "#{file_path}"` # Mac and Linux
+      end
+    rescue StandardError => e
+      puts "Failed to create file: #{e.message}"
+      @logger.log_error_activity(
+        process_name = 'file creation',
+        command_line = $PROGRAM_NAME,
+        error_message = e.message
+      )
+      return
+    else
+      @logger.log_file_activity(file_path, file_type, 'create', process_name = 'file creation', command_line = $PROGRAM_NAME,
+                                process_id = Process.pid)
+    end
+    write_log_to_file
+  end
+
   def write_log_to_file
     @logger.write_log_to_file('activity_log.json')
   end

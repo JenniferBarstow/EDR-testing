@@ -34,6 +34,24 @@ class ActivityLogger
     @log << log_entry
   end
 
+  def log_file_activity(
+    file_path, file_type, activity_descriptor,
+    process_name, command_line = '', process_id
+  )
+    log_entry = {
+      type: 'file activity',
+      timestamp: DateTime.now.to_time.utc.strftime('%Y-%m-%d %H:%M:%S'),
+      file_path: file_path,
+      file_type: file_type || File.extname(file_path)[1..],
+      activity_descriptor: activity_descriptor,
+      username: ENV['USER'] || ENV['USERNAME'],
+      process_name: process_name,
+      command_line: command_line,
+      process_id: process_id
+    }
+    @log << log_entry
+  end
+
   def write_log_to_file(file_path)
     logs = if File.exist?(file_path) && (Time.now - File.mtime(file_path)) < CACHE_TIME
              # Read the contents of the file and parse the JSON into an array of logs

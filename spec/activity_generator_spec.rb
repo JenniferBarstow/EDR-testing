@@ -68,4 +68,24 @@ describe ActivityGenerator do
     end
   end
 
+  describe '#generate_file_creation' do
+    it 'logs a file creation event' do
+      expect { generator.generate_file_creation('test.txt',) }
+        .to change { generator.instance_variable_get(:@logger).instance_variable_get(:@log) }
+        .to contain_exactly(
+          {
+            type: 'file activity',
+            timestamp: time,
+            file_path: 'test.txt',
+            file_type: '.txt',
+            activity_descriptor: 'create',
+            username: username,
+            process_name: 'file creation',
+            command_line: $0,
+            process_id: Process.pid
+          }
+        )
+    end
+  end
+
 end
