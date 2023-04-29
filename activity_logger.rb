@@ -52,6 +52,25 @@ class ActivityLogger
     @log << log_entry
   end
 
+  def log_network_activity(destination_address, destination_port, source_address, source_port,
+    amount_of_data_sent,protocol_name, process_name, command_line, process_id)
+    log_entry = {
+      type: 'network_activity',
+      timestamp: DateTime.now.to_time.utc.strftime('%Y-%m-%d %H:%M:%S'),
+      destination_address: destination_address,
+      destination_port: destination_port,
+      source_address: source_address,
+      source_port: source_port,
+      amount_of_data_sent: amount_of_data_sent,
+      protocol_name: protocol_name,
+      username: ENV['USER'] || ENV['USERNAME'],
+      process_name: process_name,
+      command_line: command_line,
+      process_id: process_id
+    }
+    @log << log_entry
+  end
+
   def write_log_to_file(file_path)
     logs = if File.exist?(file_path) && (Time.now - File.mtime(file_path)) < CACHE_TIME
              # Read the contents of the file and parse the JSON into an array of logs

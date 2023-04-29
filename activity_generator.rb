@@ -3,6 +3,8 @@
 require_relative 'activity_logger'
 require 'json'
 require 'time'
+require 'socket'
+require 'net/http'
 
 class ActivityGenerator
   def initialize
@@ -107,6 +109,53 @@ class ActivityGenerator
         file_path, '', 'delete', process_name = 'file deletion', command_line = $PROGRAM_NAME, process_id = Process.pid
       )
     end
+    write_log_to_file
+  end
+
+  def generate_network_activity(destination_address, destination_port, data)
+    # Create a new TCP socket and establish a connection to the destination
+    socket = TCPSocket.new(destination_address, destination_port)
+
+    # Get the local IP address and port number
+    local_address = Socket.ip_address_list.detect(&:ipv4_private?).ip_address
+    local_port = socket.addr[1]
+
+    # Send the data over the socket and receive the response
+    socket.write(data)
+    response = socket.read
+
+    # Get the amount of data sent and the protocol used
+    data_sent = data.bytesize
+    protocol = 'TCP'
+
+    # Get the process information
+    process_name = $PROGRAM_NAME
+    process_id = Process.pid
+    command_line = "#{destination_address}""#{destination_port}""#{data}"
+
+    # Log the network activity
+    @logger.log_network_activity(
+      destination_address = destination_address,
+      destination_port = destination_port,
+      source_address = local_address,
+      source_port = local_port,
+      amount_of_data = "#{data_sent} bytes",
+      protocol_of_data = protocol,
+      process_name = process_name,
+      process_command_line = command_line,
+      process_id = process_id
+    )
+
+    # Close the socket
+    socket.close
+  rescue StandardError => e
+    puts "Failed to generate network activity: #{e.message}"
+    @logger.log_error_activity(
+      process_name = 'network activity generation',
+      command_line = "#{$PROGRAM_NAME} #{destination_address} #{destination_port} #{data}",
+      error_message = e.message
+    )
+  ensure
     write_log_to_file
   end
 

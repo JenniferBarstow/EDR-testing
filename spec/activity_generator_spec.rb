@@ -89,43 +89,61 @@ describe ActivityGenerator do
   end
 
   describe '#generate_file_modification' do
-  it 'logs a file modification event' do
-    expect { generator.generate_file_modification('test.txt', 'hello, world') }
-      .to change { generator.instance_variable_get(:@logger).instance_variable_get(:@log) }
-      .to contain_exactly(
-        {
-          type: 'file activity',
-          timestamp: time,
-          file_path: 'test.txt',
-          file_type: '',
-          activity_descriptor: 'modify',
-          username: username,
-          process_name: 'file modification',
-          command_line: '/Users/jbarstow/.rbenv/versions/3.0.2/bin/rspec',
-          process_id: Process.pid
-        }
-      )
+    it 'logs a file modification event' do
+      expect { generator.generate_file_modification('test.txt', 'hello, world') }
+        .to change { generator.instance_variable_get(:@logger).instance_variable_get(:@log) }
+        .to contain_exactly(
+          {
+            type: 'file activity',
+            timestamp: time,
+            file_path: 'test.txt',
+            file_type: '',
+            activity_descriptor: 'modify',
+            username: username,
+            process_name: 'file modification',
+            command_line: '/Users/jbarstow/.rbenv/versions/3.0.2/bin/rspec',
+            process_id: Process.pid
+          }
+        )
+    end
   end
-end
 
-describe '#generate_file_deletion' do
-  it 'logs a file deletion event' do
-    expect { generator.generate_file_deletion('test.txt') }
-      .to change { generator.instance_variable_get(:@logger).instance_variable_get(:@log) }
-      .to contain_exactly(
-        {
-          type: 'file activity',
-          timestamp: time,
-          file_path: 'test.txt',
-          file_type: '',
-          activity_descriptor: 'delete',
-          username: username,
-          process_name: 'file deletion',
-          command_line: '/Users/jbarstow/.rbenv/versions/3.0.2/bin/rspec',
-          process_id: Process.pid
-        }
-      )
+  describe '#generate_file_deletion' do
+    it 'logs a file deletion event' do
+      expect { generator.generate_file_deletion('test.txt') }
+        .to change { generator.instance_variable_get(:@logger).instance_variable_get(:@log) }
+        .to contain_exactly(
+          {
+            type: 'file activity',
+            timestamp: time,
+            file_path: 'test.txt',
+            file_type: '',
+            activity_descriptor: 'delete',
+            username: username,
+            process_name: 'file deletion',
+            command_line: '/Users/jbarstow/.rbenv/versions/3.0.2/bin/rspec',
+            process_id: Process.pid
+          }
+        )
+    end
   end
-end
 
+  describe 'generate_network_activity' do
+    let(:logger) {  generator.instance_variable_get(:@logger) }
+    let(:file_path) { 'activity_log.json' }
+
+    it 'generates a network connection for a POST request' do
+      allow(logger).to receive(:log_network_activity)
+      allow(logger).to receive(:write_log_to_file).with('activity_log.json')
+
+      allow(Net::HTTP).to receive(:post_form).and_return('hello')
+
+      destination_address = 'www.example.com'
+      destination_port = 80
+
+      generator.generate_network_activity(destination_address, destination_port, 'body: hi')
+      expect(logger).to have_received(:log_network_activity)
+      expect(logger).to have_received(:write_log_to_file)
+    end
+  end
 end

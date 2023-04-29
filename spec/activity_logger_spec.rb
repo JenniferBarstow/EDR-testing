@@ -102,5 +102,28 @@ describe ActivityLogger do
                                                           ])
       end
     end
+
+    describe '#log_network_activity' do
+      it 'logs a network activity event' do
+        allow(DateTime).to receive(:now).and_return(DateTime.new(2021, 1, 1, 0, 0, 0))
+        logger.log_network_activity('192.168.1.1', '80', '192.168.1.2', '1234', '1024', 'TCP', 'chrome.exe', '', '1234')
+        expect(logger.instance_variable_get(:@log)).to eq([
+                                                            {
+                                                              type: 'network_activity',
+                                                              timestamp: '2021-01-01 00:00:00',
+                                                              destination_address: '192.168.1.1',
+                                                              destination_port: '80',
+                                                              source_address: '192.168.1.2',
+                                                              source_port: '1234',
+                                                              amount_of_data_sent: '1024',
+                                                              protocol_name: 'TCP',
+                                                              username: ENV['USER'],
+                                                              process_name: 'chrome.exe',
+                                                              command_line: '',
+                                                              process_id: '1234'
+                                                            }
+                                                          ])
+      end
+    end
   end
 end
