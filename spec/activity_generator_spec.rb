@@ -89,7 +89,7 @@ describe ActivityGenerator do
   end
 
   describe '#generate_file_modification' do
-    xit 'logs a file modification event' do
+    it 'logs a file modification event' do
       expect { generator.generate_file_modification('test.txt', 'hello, world') }
         .to change { generator.instance_variable_get(:@logger).instance_variable_get(:@log) }
         .to contain_exactly(

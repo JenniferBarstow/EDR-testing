@@ -30,6 +30,7 @@ class ActivityGenerator
         command_line = command_line,
         error_message = e.message
       )
+      write_log_to_file
       return
     end
     @logger.log_process_activity(
@@ -57,6 +58,7 @@ class ActivityGenerator
         command_line = command_line,
         error_message = e.message
       )
+      write_log_to_file
       return
     else
       @logger.log_file_activity(file_path, 'create', process_name = process_name, command_line = command_line,
@@ -66,8 +68,8 @@ class ActivityGenerator
   end
 
   def generate_file_modification(file_path, new_contents)
-    process_name = 'generate_file_modification',
-    command_line = "#{process_name} #{file_path} #{new_contents}"
+    process_name = 'generate_file_modification';
+    command_line = "#{process_name} #{file_path} #{new_contents}";
     begin
       unless File.exist?(file_path)
         puts "File does not exist: #{file_path}"
@@ -76,6 +78,7 @@ class ActivityGenerator
           command_line = command_line,
           error_message = "File does not exist: #{file_path}"
         )
+        write_log_to_file
         return
       end
       # Modify the file
@@ -88,6 +91,7 @@ class ActivityGenerator
         error_message = e.message
       )
       return
+      write_log_to_file
     else
       @logger.log_file_activity(
         file_path, 'modify',  process_name = process_name, command_line = command_line, Process.pid
@@ -109,6 +113,7 @@ class ActivityGenerator
         command_line = command_line,
         error_message = e.message
       )
+      write_log_to_file
       return
     else
       @logger.log_file_activity(
