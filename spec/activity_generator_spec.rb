@@ -80,8 +80,8 @@ describe ActivityGenerator do
             file_type: '.txt',
             activity_descriptor: 'create',
             username: username,
-            process_name: 'file creation',
-            command_line: $0,
+            process_name: 'generate_file_creation',
+            command_line: 'generate_file_creation test.txt',
             process_id: Process.pid
           }
         )
@@ -100,8 +100,8 @@ describe ActivityGenerator do
             file_type: '.txt',
             activity_descriptor: 'modify',
             username: username,
-            process_name: 'file modification',
-            command_line: $0,
+            process_name: 'generate_file_modification',
+            command_line: 'generate_file_modification test.txt hello, world',
             process_id: Process.pid
             
           }
@@ -121,8 +121,8 @@ describe ActivityGenerator do
             file_type: '.txt',
             activity_descriptor: 'delete',
             username: username,
-            process_name: 'file deletion',
-            command_line: $0,
+            process_name: 'generate_file_deletion',
+            command_line: 'generate_file_deletion test.txt',
             process_id: Process.pid
           }
         )
