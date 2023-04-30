@@ -26,17 +26,17 @@ class ActivityGenerator
     rescue StandardError => e
       puts "Failed to start process: #{e.message}"
       @logger.log_error_activity(
-        process_name = process_name,
-        command_line = command_line,
-        error_message = e.message
+        process_name,
+        command_line,
+        e.message
       )
       write_log_to_file
       return
     end
     @logger.log_process_activity(
-      process_id = pid,
-      process_name = process_name,
-      command_line = command_line
+      pid,
+      process_name,
+      command_line
     )
     write_log_to_file
   end
@@ -54,15 +54,14 @@ class ActivityGenerator
     rescue StandardError => e
       puts "Failed to create file: #{e.message}"
       @logger.log_error_activity(
-        process_name = process_name,
-        command_line = command_line,
-        error_message = e.message
+        process_name,
+        command_line,
+        e.message
       )
       write_log_to_file
       return
     else
-      @logger.log_file_activity(file_path, 'create', process_name = process_name, command_line = command_line,
-                                process_id = Process.pid)
+      @logger.log_file_activity(file_path, 'create', process_name, command_line, Process.pid)
     end
     write_log_to_file
   end
@@ -74,8 +73,8 @@ class ActivityGenerator
       unless File.exist?(file_path)
         puts "File does not exist: #{file_path}"
         @logger.log_error_activity(
-          process_name = process_name,
-          command_line = command_line,
+          process_name,
+          command_line,
           error_message = "File does not exist: #{file_path}"
         )
         write_log_to_file
@@ -86,15 +85,15 @@ class ActivityGenerator
     rescue StandardError => e
       puts "Failed to modify file: #{e.message}"
       @logger.log_error_activity(
-        process_name = process_name,
-        command_line = command_line,
-        error_message = e.message
+        process_name,
+        command_line,
+        e.message
       )
       return
       write_log_to_file
     else
       @logger.log_file_activity(
-        file_path, 'modify',  process_name = process_name, command_line = command_line, Process.pid
+        file_path, 'modify', process_name, command_line, Process.pid
       )
     end
     write_log_to_file
@@ -109,9 +108,9 @@ class ActivityGenerator
     rescue StandardError => e
       puts "Failed to delete file: #{e.message}"
       @logger.log_error_activity(
-        process_name = process_name,
-        command_line = command_line,
-        error_message = e.message
+        process_name,
+        command_line,
+        e.message
       )
       write_log_to_file
       return
@@ -162,9 +161,9 @@ class ActivityGenerator
   rescue StandardError => e
     puts "Failed to generate network activity: #{e.message}"
     @logger.log_error_activity(
-      process_name = process_name,
-      command_line = command_line,
-      error_message = e.message
+      process_name,
+      command_line,
+      e.message
     )
   ensure
     write_log_to_file
