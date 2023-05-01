@@ -28,21 +28,20 @@ class ActivityGenerator
       if os_type == 'Windows'
         pid = Process.spawn("#{executable_path}.exe", *args)
         Process.wait(pid)
-        if $?.success?
-          status_type = 'success'
-        else
-          status_type = 'failure'
-        end
+        status_type = if $?.success?
+                        'success'
+                      else
+                        'failure'
+                      end
       else
         pid = Process.spawn(executable_path, *args)
         Process.wait(pid)
-        if $?.success?
-          status_type = 'success'
-        else
-          status_type = 'failure'
-        end
+        status_type = if $?.success?
+                        'success'
+                      else
+                        'failure'
+                      end
       end
-  
     rescue StandardError => e
       puts "Failed to start process: #{e.message}"
       return
@@ -54,7 +53,7 @@ class ActivityGenerator
       status_type
     )
     write_log_to_file
-  end  
+  end
 
   def generate_file_creation(file_path)
     process_name = 'generate_file_creation'
@@ -64,20 +63,15 @@ class ActivityGenerator
         command_line = "type nul > #{file_path}" # Windows
         pid = Process.spawn(command_line)
         Process.wait(pid)
-        if $?.success?
-          status_type = 'success'
-        else
-          status_type = 'failure'
-        end
       else
         command_line = "touch #{file_path}" # Mac and Linux
         system(command_line)
-        if File.exist?(file_path)
-          status_type = 'success'
-        else
-          status_type = 'failure'
-        end
       end
+      status_type = if File.exist?(file_path)
+        'success'
+      else
+        'failure'
+      end  
     rescue StandardError => e
       puts "Failed to create file: #{e.message}"
       return
@@ -101,12 +95,12 @@ class ActivityGenerator
     else
       status_type = 'failure'
     end
+
     @logger.log_file_activity(
       file_path, 'modify', process_name, command_line, Process.pid, status_type
     )
     write_log_to_file
   end
-  
 
   def generate_file_deletion(file_path)
     process_name = 'generate_file_deletion'
@@ -118,7 +112,7 @@ class ActivityGenerator
     if File.exist?(file_path)
       status_type = 'failure'
     else
-      status_type = 'success'
+      'success'
     end
 
     @logger.log_file_activity(
@@ -126,7 +120,6 @@ class ActivityGenerator
     )
     write_log_to_file
   end
-
 
   def generate_network_activity(destination_address, destination_port, data)
     # Create a new TCP socket and establish a connection to the destination
@@ -145,7 +138,7 @@ class ActivityGenerator
     protocol = 'TCP'
 
     # Get the process information
-    process_name = "generate_network_activity"
+    process_name = 'generate_network_activity'
     process_id = Process.pid
     command_line = "#{process_name} #{destination_address} #{destination_port} #{data}"
 
@@ -166,14 +159,11 @@ class ActivityGenerator
     socket.close
   rescue StandardError => e
     puts "Failed to generate network activity: #{e.message}"
-
   ensure
     write_log_to_file
   end
 
-
   def write_log_to_file
     @logger.write_log_to_file('activity_log.json')
   end
-
 end

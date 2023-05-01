@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require 'json'
 require 'date'
 require_relative '../activity_generator'
@@ -49,7 +50,8 @@ describe ActivityLogger do
     context 'file creation' do
       it 'logs a file creation activity event' do
         allow(DateTime).to receive(:now).and_return(DateTime.new(2021, 1, 1, 0, 0, 0))
-        logger.log_file_activity('example.txt', 'create', 'generate_file_creation', 'touch example.txt', '1234', 'success')
+        logger.log_file_activity('example.txt', 'create', 'generate_file_creation', 'touch example.txt', '1234',
+                                 'success')
         expect(logger.instance_variable_get(:@log)).to eq([
                                                             {
                                                               type: 'file activity',
@@ -71,7 +73,7 @@ describe ActivityLogger do
       it 'logs a file modification activity event' do
         command_line = "File.open('example.txt', 'w') { |file| file.write('hello, world') }"
         allow(DateTime).to receive(:now).and_return(DateTime.new(2021, 1, 1, 0, 0, 0))
-        logger.log_file_activity('example.txt','modify', 'generate_file_modification', command_line, '1234', 'success')
+        logger.log_file_activity('example.txt', 'modify', 'generate_file_modification', command_line, '1234', 'success')
         expect(logger.instance_variable_get(:@log)).to eq([
                                                             {
                                                               type: 'file activity',
@@ -91,9 +93,9 @@ describe ActivityLogger do
 
     context 'file deletion' do
       it 'logs a file deletion activity event' do
-        command_line =  "File.delete('example.txt')"
+        command_line = "File.delete('example.txt')"
         allow(DateTime).to receive(:now).and_return(DateTime.new(2021, 1, 1, 0, 0, 0))
-        logger.log_file_activity('example.txt', 'delete', 'file deletion', command_line , '1234', 'success')
+        logger.log_file_activity('example.txt', 'delete', 'file deletion', command_line, '1234', 'success')
         expect(logger.instance_variable_get(:@log)).to eq([
                                                             {
                                                               type: 'file activity',
@@ -115,7 +117,8 @@ describe ActivityLogger do
       it 'logs a network activity event' do
         command_line = 'generate_network_activity 192.168.1.1 80 data'
         allow(DateTime).to receive(:now).and_return(DateTime.new(2021, 1, 1, 0, 0, 0))
-        logger.log_network_activity('192.168.1.1', '80', '192.168.1.2', '1234', '1024', 'TCP', 'chrome.exe', command_line, '1234')
+        logger.log_network_activity('192.168.1.1', '80', '192.168.1.2', '1234', '1024', 'TCP', 'chrome.exe',
+                                    command_line, '1234')
         expect(logger.instance_variable_get(:@log)).to eq([
                                                             {
                                                               type: 'network activity',

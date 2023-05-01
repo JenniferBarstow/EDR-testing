@@ -25,7 +25,7 @@ class ActivityLogger
 
   def log_file_activity(
     file_path, activity_descriptor,
-    process_name, command_line='', process_id, status_type
+    process_name, command_line = '', process_id, status_type
   )
     log_entry = {
       type: 'file activity',
@@ -43,7 +43,7 @@ class ActivityLogger
   end
 
   def log_network_activity(destination_address, destination_port, source_address, source_port,
-    amount_of_data_sent,protocol_name, process_name, command_line, process_id)
+                           amount_of_data_sent, protocol_name, process_name, command_line, process_id)
     log_entry = {
       type: 'network activity',
       timestamp: DateTime.now.to_time.utc.strftime('%Y-%m-%d %H:%M:%S'),
@@ -62,18 +62,14 @@ class ActivityLogger
   end
 
   def write_log_to_file(file_path)
-    logs = if File.exist?(file_path) && (Time.now - File.mtime(file_path)) < CACHE_TIME
-             # Read the contents of the file and parse the JSON into an array of logs
-             JSON.parse(File.read(file_path))
-           else
-             # Create a new array for the logs
-             []
-           end
+    if File.exist?(file_path) && (Time.now - File.mtime(file_path)) < CACHE_TIME
+      logs = JSON.parse(File.read(file_path))
+    else
+      logs = []
+    end
 
-    # Append the new log to the array
     logs << @log
 
-    # Write the updated array of logs to the file
     File.open(file_path, 'w') do |file|
       file.write(JSON.pretty_generate(logs))
     end

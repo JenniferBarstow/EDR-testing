@@ -7,7 +7,7 @@ RSpec.describe ActivityGenerator do
 
   describe '#start_process' do
     let(:executable_path) { 'pwd' }
-    let(:args) {''}
+    let(:args) { '' }
 
     it 'logs the process activity' do
       expect_any_instance_of(ActivityLogger).to receive(:log_process_activity)
@@ -41,11 +41,11 @@ RSpec.describe ActivityGenerator do
   describe '#generate_file_modification' do
     let(:file_path) { 'test_file.txt' }
     let(:new_contents) { 'new contents' }
-   
+
     before do
       `touch #{file_path}`
     end
-   
+
     it 'logs the file activity' do
       expect_any_instance_of(ActivityLogger).to receive(:log_file_activity)
 
@@ -65,7 +65,7 @@ RSpec.describe ActivityGenerator do
     before do
       `touch #{file_path}`
     end
-   
+
     it 'logs the file activity' do
       expect_any_instance_of(ActivityLogger).to receive(:log_file_activity)
       generator.generate_file_deletion(file_path)
