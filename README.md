@@ -11,7 +11,7 @@ The user interacts with the program from the command line, using the `ActivityCL
 The ActivityCLI class is a command line interface that takes a command and arguments as input, and uses a `case` statement to determine which `ActivityGenerator`method to call. This gives you the ability to call given processes from the command line, using commands like the ones below.
 
 ```ruby
-$ ruby activity_cli.rb start_process redis-cli --help
+$ ruby activity_cli.rb start_process pwd
 $ ruby activity_cli.rb generate_file_creation example.txt
 $ ruby activity_cli.rb generate_file_modification example.txt hello, world
 $ ruby activity_cli.rb generate_file_deletion example.txt
