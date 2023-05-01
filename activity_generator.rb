@@ -112,7 +112,7 @@ class ActivityGenerator
     if File.exist?(file_path)
       status_type = 'failure'
     else
-      'success'
+      status_type = 'success'
     end
 
     @logger.log_file_activity(
