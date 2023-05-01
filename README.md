@@ -20,9 +20,9 @@ $ ruby activity_cli.rb generate_network_activity icanhazip.com 80 'some data to 
 ```
 To generate errors to view in logs
 ```ruby
-$ ruby activity_cli.rb start_process reboot now 
+$ ruby activity_cli.rb start_process `$process_you_dont_have_permissions_to` 
 $ ruby activity_cli.rb generate_file_creation invalid_path/example.txt
-$ ruby activity_cli.rb generate_file_creation test.txt $ ruby activity_cli.rb generate_file_modification test.txt
+$ ruby activity_cli.rb generate_file_creation `$existing_file_path` `$existing_content`
 ```
 
 **Viewing the Logs**
