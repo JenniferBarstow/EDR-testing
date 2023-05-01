@@ -11,116 +11,122 @@ class ActivityGenerator
     @logger = ActivityLogger.new
   end
 
+  def os_type
+    if RUBY_PLATFORM =~ /mswin|mingw|cygwin/
+      'Windows'
+    else
+      'Unix'
+    end
+  end
+
   def start_process(executable_path, *args)
-    process_name = File.basename(executable_path)
-    command_line = "#{process_name} #{args.join(' ')}"
+    process_name = 'start_process'
+    command_line = "#{process_name} #{executable_path} #{args.join(' ')}"
+    status_type = ''
+    pid = nil
     begin
-      pid = case RUBY_PLATFORM
-            when /mswin|mingw|cygwin/
-              # Windows
-              Process.spawn("#{executable_path}.exe", *args)
-            else
-              # Mac and Linux
-              Process.spawn(executable_path, *args)
-            end
+      if os_type == 'Windows'
+        pid = Process.spawn("#{executable_path}.exe", *args)
+        Process.wait(pid)
+        if $?.success?
+          status_type = 'success'
+        else
+          status_type = 'failure'
+        end
+      else
+        pid = Process.spawn(executable_path, *args)
+        Process.wait(pid)
+        if $?.success?
+          status_type = 'success'
+        else
+          status_type = 'failure'
+        end
+      end
+  
     rescue StandardError => e
       puts "Failed to start process: #{e.message}"
-      @logger.log_error_activity(
-        process_name,
-        command_line,
-        e.message
-      )
-      write_log_to_file
       return
     end
     @logger.log_process_activity(
       pid,
       process_name,
-      command_line
+      command_line,
+      status_type
     )
     write_log_to_file
-  end
+  end  
 
   def generate_file_creation(file_path)
     process_name = 'generate_file_creation'
-    command_line = "#{process_name} #{file_path}"
+    command_line = ''
     begin
-      case RUBY_PLATFORM
-      when /mswin|mingw|cygwin/
-        `type nul > "#{file_path}"` # Windows
+      if os_type == 'Windows'
+        command_line = "type nul > #{file_path}" # Windows
+        pid = Process.spawn(command_line)
+        Process.wait(pid)
+        if $?.success?
+          status_type = 'success'
+        else
+          status_type = 'failure'
+        end
       else
-        `touch "#{file_path}"` # Mac and Linux
+        command_line = "touch #{file_path}" # Mac and Linux
+        system(command_line)
+        if File.exist?(file_path)
+          status_type = 'success'
+        else
+          status_type = 'failure'
+        end
       end
     rescue StandardError => e
       puts "Failed to create file: #{e.message}"
-      @logger.log_error_activity(
-        process_name,
-        command_line,
-        e.message
-      )
-      write_log_to_file
       return
     else
-      @logger.log_file_activity(file_path, 'create', process_name, command_line, Process.pid)
+      @logger.log_file_activity(file_path, 'create', process_name, command_line, Process.pid, status_type)
     end
     write_log_to_file
   end
 
   def generate_file_modification(file_path, new_contents)
-    process_name = 'generate_file_modification';
-    command_line = "#{process_name} #{file_path} #{new_contents}";
-    begin
-      unless File.exist?(file_path)
-        puts "File does not exist: #{file_path}"
-        @logger.log_error_activity(
-          process_name,
-          command_line,
-          error_message = "File does not exist: #{file_path}"
-        )
-        write_log_to_file
-        return
-      end
-      # Modify the file
-      File.open(file_path, 'w') { |file| file.write(new_contents) }
-    rescue StandardError => e
-      puts "Failed to modify file: #{e.message}"
-      @logger.log_error_activity(
-        process_name,
-        command_line,
-        e.message
-      )
-      return
-      write_log_to_file
+    process_name = 'generate_file_modification'
+    previous_contents = File.read(file_path)
+
+    command_line = "File.open('#{file_path}', 'w') { |file| file.write('#{new_contents}') }"
+
+    File.open(file_path, 'w') { |file| file.write(new_contents) }
+    new_contents = File.read(file_path)
+
+    if previous_contents != new_contents
+      status_type = 'success'
     else
-      @logger.log_file_activity(
-        file_path, 'modify', process_name, command_line, Process.pid
-      )
+      status_type = 'failure'
     end
+    @logger.log_file_activity(
+      file_path, 'modify', process_name, command_line, Process.pid, status_type
+    )
     write_log_to_file
   end
+  
 
   def generate_file_deletion(file_path)
     process_name = 'generate_file_deletion'
-    command_line = "#{process_name} #{file_path}"
-    begin
-      # Delete the file
-      File.delete(file_path)
-    rescue StandardError => e
-      puts "Failed to delete file: #{e.message}"
-      @logger.log_error_activity(
-        process_name,
-        command_line,
-        e.message
-      )
-      write_log_to_file
-      return
+    status_type = 'none'
+    command_line = "File.delete('#{file_path}')"
+
+    File.delete(file_path)
+
+    if File.exist?(file_path)
+      status_type = 'failure'
     else
-      @logger.log_file_activity(
-        file_path, 'delete', process_name, command_line, Process.pid
-      )
+      status_type = 'success'
     end
+
+    @logger.log_file_activity(
+      file_path, 'delete', process_name, command_line, Process.pid, status_type
+    )
     write_log_to_file
   end
+
 
   def generate_network_activity(destination_address, destination_port, data)
     # Create a new TCP socket and establish a connection to the destination
@@ -160,11 +166,7 @@ class ActivityGenerator
     socket.close
   rescue StandardError => e
     puts "Failed to generate network activity: #{e.message}"
-    @logger.log_error_activity(
-      process_name,
-      command_line,
-      e.message
-    )
+
   ensure
     write_log_to_file
   end
