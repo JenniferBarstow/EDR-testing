@@ -144,15 +144,15 @@ class ActivityGenerator
 
     # Log the network activity
     @logger.log_network_activity(
-      destination_address = destination_address,
-      destination_port = destination_port,
-      source_address = local_address,
-      source_port = local_port,
-      amount_of_data = "#{data_sent} bytes",
-      protocol_of_data = protocol,
-      process_name = process_name,
-      command_line = command_line,
-      process_id = process_id
+      destination_address,
+      destination_port,
+      local_address,
+      local_port,
+      "#{data_sent} bytes",
+      protocol,
+      process_name,
+      command_line,
+      process_id
     )
 
     # Close the socket
