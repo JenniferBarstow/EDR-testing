@@ -1,4 +1,4 @@
-# homerwork_assignment
+# homework_assignment
 
 This Ruby programs allows you to generate different processes and types of activity and then adds them to a log. The program is separated into 3 main parts: `ActivityGenerator`, `ActivityLogger` and `ActivityCLI`.
 
